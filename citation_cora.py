@@ -25,11 +25,12 @@ if args.tuned:
 # setting random seeds
 set_seed(args.seed, args.cuda)
 
-adj, features, labels, idx_train, idx_val, idx_test = load_citation(args.dataset, args.normalization, args.cuda)
+adj, features, labels, idx_train, idx_val, idx_test = load_citation(args.dataset, args.normalization, args.cuda) # 对citation adj 进行normalization, 对0,1 的raw 矩阵进行row normalization
 
 model = get_model(args.model, features.size(1), labels.max().item()+1, args.hidden, args.dropout, args.cuda)
 
-if args.model == "SGC": features, precompute_time = sgc_precompute(features, adj, args.degree, args.alpha)
+if args.model == "SGC":
+    features, precompute_time = sgc_precompute(features, adj, args.degree, args.alpha)
 print("{:.4f}s".format(precompute_time))
 
 def train_regression(model,
@@ -41,7 +42,7 @@ def train_regression(model,
     optimizer = optim.Adam(model.parameters(), lr=lr,
                            weight_decay=weight_decay)
     t = perf_counter()
-    best_acc_val = torch.zeros((1))
+    best_acc_val = 0.0
     best_loss_val = 100.
     best_model = None
     for epoch in range(epochs):
@@ -56,10 +57,10 @@ def train_regression(model,
             output = model(val_features)
             acc_val = accuracy(output, val_labels)
             loss_val = F.cross_entropy(output, val_labels)
-            if best_acc_val < acc_val:
+            if best_acc_val < acc_val.item():
                  best_acc_val = acc_val
             #     best_model = model
-            if best_loss_val > loss_val:
+            if best_loss_val > loss_val.item():
                 best_loss_val = loss_val
                 best_model = model
 

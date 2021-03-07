@@ -61,7 +61,7 @@ def load_citation(dataset_str="cora", normalization="NormAdj", cuda=True):
     features = sp.vstack((allx, tx)).tolil()
     features[test_idx_reorder, :] = features[test_idx_range, :]
     adj = nx.adjacency_matrix(nx.from_dict_of_lists(graph))
-    adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
+    adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj) #
     labels = np.vstack((ally, ty))
     labels[test_idx_reorder, :] = labels[test_idx_range, :]
 
